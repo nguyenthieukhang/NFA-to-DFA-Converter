@@ -59,26 +59,27 @@ def DFA_generator(start_state, states, symbols, transitions, epsilon_closure_set
 				continue
 			if next_set_frozen not in vis:
 				vis.add(next_set_frozen)
-				st.append(next_set_frozen)
-				ret.append([top, symbol, next_set])
+				st.append(next_set)
+			ret.append([top, symbol, next_set])
+
 
 	return ret
 
 def output_format(transition : list, final_states : list, epsilon_closure_start : set):
 	state1 = str(transition[0])
-	if transition[0] == epsilon_closure_start and any(f in transitions[0] for f in final_states):
+	if transition[0] == epsilon_closure_start and any([(f in transition[0]) for f in final_states]):
 		state1 = colored(state1, 'green')
 	elif transition[0] == epsilon_closure_start:
 		state1 = colored(state1, 'yellow')
-	elif any(f in transitions[0] for f in final_states):
+	elif any([(f in transition[0]) for f in final_states]):
 		state1 = colored(state1, 'red')
 
 	state2 = str(transition[2])
-	if transition[2] == epsilon_closure_start and any(f in transitions[2] for f in final_states):
+	if transition[2] == epsilon_closure_start and any([(f in transition[2]) for f in final_states]):
 		state2 = colored(state2, 'green')
 	elif transition[2] == epsilon_closure_start:
 		state2 = colored(state2, 'yellow')
-	elif any(f in transitions[2] for f in final_states):
+	elif any([(f in transition[2]) for f in final_states]):
 		state2 = colored(state2, 'red')
 
 	print(state1, '---', colored(transition[1], 'cyan') , '--- >', state2)
@@ -116,7 +117,14 @@ if __name__ == "__main__":
 
 	DFA = DFA_generator(start_state, states, symbols, transitions, epsilon_closure)
 
+	DFA.sort(key = lambda x : len(str(x)))
+
 	print('This is the DFA: ')
+	DFA_states = set()
 	for t in DFA:
+		DFA_states.add(frozenset(t[0]))
+		DFA_states.add(frozenset(t[2]))
 		output_format(t, final_states, epsilon_closure[start_state])
+
+	print('There are', colored(str(len(DFA)), 'yellow'), 'transitions and', colored(str(len(DFA_states)), 'yellow'), 'states in this DFA.')
 
